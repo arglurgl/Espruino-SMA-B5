@@ -1,3 +1,5 @@
+# This is the branch you need to pull/checkout for SMA-B5 hardware
+
 Espruino JavaScript for Microcontrollers
 ========================================
 <pre>
