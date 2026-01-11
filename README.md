@@ -1,3 +1,6 @@
+# This master branch is only used for tracking the official firmware changes. For SMA-B5 hardware please git checkout Espruino-SMA-B5.
+Link: https://github.com/arglurgl/Espruino-SMA-B5/tree/Espruino-SMA-B5
+
 Espruino JavaScript for Microcontrollers
 ========================================
 <pre>
