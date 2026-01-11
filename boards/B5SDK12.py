@@ -46,9 +46,10 @@ info = {
       'DEFINES+=-DBLUETOOTH_NAME_PREFIX=\'"B5"\'', # Bluetooth device name prefix
       'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=53 -DNRF_BLE_MAX_MTU_SIZE=53', # increase MTU from default of 23
       'LDFLAGS += -Xlinker --defsym=LD_APP_RAM_BASE=0x2c40', # set RAM base to match MTU
-      'DEFINES+=-DBLE_HIDS_ENABLED=1',
+      #'DEFINES+=-DBLE_HIDS_ENABLED=1', # for emulating keyboard/mouse etc over BLE
 
       # DFU settings:
+      'DEFINES += -DBUTTONPRESS_TO_REBOOT_BOOTLOADER', # to have some way to get out of DFU mode, since we have no reset/power cycle
       'NRF_BL_DFU_INSECURE=1', # allow insecure DFU (no signature checking)
       'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
       'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',     
