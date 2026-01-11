@@ -23,22 +23,20 @@ info = {
  'boardname' : 'SMAB5', # visible in process.env.BOARD
   # This is the PCA10036
  'default_console' : "EV_BLUETOOTH",
- 'variables' : 2565, # *16//13 2565 SD5.0 0x200014B8 SD 3.0 0x200019C0  How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
+ 'variables' : 2000, # *16//13 2565 SD5.0 0x200014B8 SD 3.0 0x200019C0  How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
  'bootloader' : 1,
  'binary_name' : 'espruino_%v_SMAB5.hex',
  'build' : {
    'optimizeflags' : '-Os',
    'libraries' : [
      'BLUETOOTH',
-#     'NET',
-     'GRAPHICS',
-#     'LCD_SPI',
-#     'NFC',
-#     'NEOPIXEL'
+     'GRAPHICS', 
+     'LCD_SPI'
    ],
    'makefile' : [
 #    'SAVE_ON_FLASH=1',
 #     'DEFINES+=-DCONFIG_GPIO_AS_PINRESET', # Allow the reset pin to work
+     'DEFINES += -DBOARD_SMAB5', # not sure how board defines usually work so adding this manually here
      'DEFINES += -DCONFIG_NFCT_PINS_AS_GPIOS', # Allow using NFC pins for gpio
 #     'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=131 -DNRF_BLE_MAX_MTU_SIZE=131', # increase MTU from default of 23
      'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=53 -DNRF_BLE_MAX_MTU_SIZE=53', # increase MTU from default of 23
@@ -108,19 +106,29 @@ chip = {
 };
 
 devices = {
-  'BTN1' : { 'pin' : 'D9', 'pinstate' : 'IN_PULLDOWN' },
-  'VIBRATE' : { 'pin' : 'D30' },
-  'SPIFLASH' : {
-            'pin_sck' : 'D14',
-            'pin_mosi' : 'D13',
-            'pin_miso' : 'D11',
-            'pin_cs' : 'D12',
-##            'pin_wp' : '',
-##            'pin_hold' : '',
-##            'pin_rst' : '', # no reset but this is HOLD pin for XENON, we want it set to 1
-            'size' : 2048*1024, # 2MB
-            'memmap_base' : 0x60000000 # map into the address space (in software)
- }
+    'BTN1' : { 'pin' : 'D9', 'pinstate' : 'IN_PULLDOWN' },
+    'VIBRATE' : { 'pin' : 'D30' },
+    'SPIFLASH' : {
+              'pin_sck' : 'D14',
+              'pin_mosi' : 'D13',
+              'pin_miso' : 'D11',
+              'pin_cs' : 'D12',
+  ##            'pin_wp' : '',
+  ##            'pin_hold' : '',
+  ##            'pin_rst' : '', # no reset but this is HOLD pin for XENON, we want it set to 1
+              'size' : 2048*1024, # 2MB
+              'memmap_base' : 0x60000000 # map into the address space (in software)
+    },
+    'LCD' : {
+            'width' : 80, 'height' : 160, 'bpp' : 12,
+            'controller' : 'st7735',
+            'pin_dc' : 'D6',
+            'pin_cs' : 'D5',
+            'pin_rst' : 'D8',
+            'pin_sck' : 'D2',
+            'pin_mosi' : 'D3',
+            'pin_bl' : 'D29',
+    },
 };
 
 

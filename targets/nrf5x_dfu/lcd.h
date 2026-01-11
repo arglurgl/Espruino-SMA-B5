@@ -26,10 +26,17 @@
 #endif
 #ifdef LCD_CONTROLLER_ST7735 // F5
 #define LCD
+#ifdef BOARD_SMAB5 // SMAB5 has a slightly different LCD and wiring
+#define LCD_DATA_WIDTH 80
+#define LCD_DATA_HEIGHT 160
+#define LCD_STORE_MODIFIED
+#define LCD_BL_ON 1
+#else
 #define LCD_DATA_WIDTH 128
 #define LCD_DATA_HEIGHT 96
 #define LCD_STORE_MODIFIED
 #define LCD_BL_ON 0
+#endif
 #endif
 #ifdef LCD_CONTROLLER_ST7789_8BIT // Bangle.js
 #define LCD
