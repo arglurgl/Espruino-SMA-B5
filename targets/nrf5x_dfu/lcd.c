@@ -573,8 +573,13 @@ static const char SPILCD_INIT_CODE[] = {
    0xC5, 0, 1,  /*data*/0x0E ,
   // INVOFF Don't invert display
    0x20, 0, 0,
+   #ifdef BOARD_SMAB5 // need to mirror left-right for SMA B5
   // MADCTL row address/col address, bottom to top refesh (10.1.27)
+   0x36, 0, 1, /*data*/0x88,
+   #else
+     // MADCTL row address/col address, bottom to top refesh (10.1.27)
    0x36, 0, 1, /*data*/0xC8,
+   #endif
   // COLMOD, Color mode 12 bit
    0x3A, 0, 1, /*data*/0x03,
   // GMCTRP1 Gamma correction
@@ -685,10 +690,17 @@ void lcd_flip() {
     jshPinSetValue(LCD_SPI_CS, 1);
     jshPinSetValue(LCD_SPI_DC, 1); // data
     jshPinSetValue(LCD_SPI_CS, 0);
+    #ifdef BOARD_SMAB5
+    lcd_wr(0);
+    lcd_wr(24);  // Column start offset for SMAB5
+    lcd_wr(0);
+    lcd_wr(24 + LCD_WIDTH - 1);  // Column start offset for SMAB5
+    #else
     lcd_wr(0);
     lcd_wr(0);
     lcd_wr(0);
     lcd_wr(LCD_WIDTH-1);
+    #endif
     jshPinSetValue(LCD_SPI_CS, 1);
     jshPinSetValue(LCD_SPI_DC, 0); // command
     jshPinSetValue(LCD_SPI_CS, 0);
