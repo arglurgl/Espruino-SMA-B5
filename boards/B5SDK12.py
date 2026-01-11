@@ -18,10 +18,7 @@ import pinutils;
 
 info = {
  'name' : "SMA B5 GPS smartwatch",
-# 'link' :  [ "https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF52-DK" ],
-# 'espruino_page_link' : 'nRF52832DK',
  'boardname' : 'SMAB5', # visible in process.env.BOARD
-  # This is the PCA10036
  'default_console' : "EV_BLUETOOTH",
  'variables' : 2000, # *16//13 2565 SD5.0 0x200014B8 SD 3.0 0x200019C0  How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
  'bootloader' : 1,
@@ -34,24 +31,30 @@ info = {
      'LCD_SPI'
    ],
    'makefile' : [
-#    'SAVE_ON_FLASH=1',
-#     'DEFINES+=-DCONFIG_GPIO_AS_PINRESET', # Allow the reset pin to work
-     'DEFINES += -DBOARD_SMAB5', # not sure how board defines usually work so adding this manually here
-     'DEFINES += -DCONFIG_NFCT_PINS_AS_GPIOS', # Allow using NFC pins for gpio
-#     'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=131 -DNRF_BLE_MAX_MTU_SIZE=131', # increase MTU from default of 23
-     'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=53 -DNRF_BLE_MAX_MTU_SIZE=53', # increase MTU from default of 23
-     'LDFLAGS += -Xlinker --defsym=LD_APP_RAM_BASE=0x2c40', # set RAM base to match MTU
-     'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
-#     'DEFINES+=-DJSVAR_FORCE_16_BYTE=1', # 16 byte variables
-     'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
-     'DEFINES+=-DBLUETOOTH_NAME_PREFIX=\'"B5"\'',
-     'DEFINES+=-DUSE_FONT_6X8 -DBLE_HIDS_ENABLED=1 -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
-     'NRF_BL_DFU_INSECURE=1',
-     'DEFINES+=-DBTN1_IS_TOUCH=1',
-#     'LINKER_BOOTLOADER=targetlibs/nrf5x_12/nrf5x_linkers/banglejs_dfu.ld',
-     'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
-     'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',
+      'DEFINES += -DBOARD_SMAB5', # not sure how board defines usually work so adding this manually here
 
+      #hardware specific defines:
+      'DEFINES += -DCONFIG_NFCT_PINS_AS_GPIOS', # Allow using NFC pins for gpio
+      'DEFINES+=-DBTN1_IS_TOUCH=1', # BTN1 is a touch button
+      'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
+
+      # generic defines:
+      'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
+      #'DEFINES+=-DJSVAR_FORCE_16_BYTE=1', # 16 byte variables, without this 13 bytes seem to be used
+
+      # Bluetooth settings:
+      'DEFINES+=-DBLUETOOTH_NAME_PREFIX=\'"B5"\'', # Bluetooth device name prefix
+      'DEFINES+=-DNRF_BLE_GATT_MAX_MTU_SIZE=53 -DNRF_BLE_MAX_MTU_SIZE=53', # increase MTU from default of 23
+      'LDFLAGS += -Xlinker --defsym=LD_APP_RAM_BASE=0x2c40', # set RAM base to match MTU
+      'DEFINES+=-DBLE_HIDS_ENABLED=1',
+
+      # DFU settings:
+      'NRF_BL_DFU_INSECURE=1', # allow insecure DFU (no signature checking)
+      'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
+      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',     
+
+      # graphics/LCD settings:
+      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1'
    ]
  }
 };
@@ -70,38 +73,16 @@ chip = {
   'adc' : 1,
   'dac' : 0,
   'saved_code' : {
-    #original experimental two bank (strange when ':' in filename)
-#     'page_size' : 4096,
-#     'address' : ((118 - 16) * 4096), # Bootloader takes pages 120-127, FS takes 118-119
-# #    'address' : ((118 - 10) * 4096), # Bootloader takes pages 120-127, FS takes 118-119
-#     'pages' : 16, #10
-# #    'flash_available' : 512 - ((28 + 8 + 2 + 10)*4) # Softdevice 2.0 uses 28 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-#     'flash_available' : 512 - ((31 + 8 + 2 + 16)*4), # Softdevice 3.0 uses 31 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-# #    'flash_available' : 512 - ((35 + 8 + 10 + 10)*4) # Softdevice 5.0  uses 35 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-# #    'flash_available' : 512 - ((38 + 8 + 2 +16)*4) # Softdevice 6.x  uses 38 pages of flash, bootloader 8, FS 2, no code. Each page is 4 kb.
-#     'address2' : 0x60000000, # second bank (for second 'drive' of storage module, see jsflash.c) in external spiflash (see below)
-#     'pages2' : 512, # Entire 2MB of external flash
-#     #10 pages version from comments
-#     'page_size' : 4096,
-#     'address' : ((118 - 10) * 4096), # Bootloader takes pages 120-127, FS takes 118-119
-#     'pages' : 10,
-# #    'flash_available' : 512 - ((28 + 8 + 2 + 10)*4) # Softdevice 2.0 uses 28 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-#     'flash_available' : 512 - ((31 + 8 + 2 + 10)*4), # Softdevice 3.0 uses 31 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-# #    'flash_available' : 512 - ((35 + 8 + 10 + 10)*4) # Softdevice 5.0  uses 35 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-# #    'flash_available' : 512 - ((38 + 8 + 2 +16)*4) # Softdevice 6.x  uses 38 pages of flash, bootloader 8, FS 2, no code. Each page is 4 kb.
-#     'address2' : 0x60000000, # second bank (for second 'drive' of storage module, see jsflash.c) in external spiflash (see below)
-#     'pages2' : 512, # Entire 2MB of external flash
     #single-bank external version
     'page_size' : 4096,
     #'address' : ((118 - 10) * 4096), # Bootloader takes pages 120-127, FS takes 118-119
     #'pages' : 10,
-#    'flash_available' : 512 - ((28 + 8 + 2 + 10)*4) # Softdevice 2.0 uses 28 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
+    #'flash_available' : 512 - ((28 + 8 + 2 + 10)*4) # Softdevice 2.0 uses 28 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
     'flash_available' : 512 - ((31 + 8 + 2 + 10)*4), # Softdevice 3.0 uses 31 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-#    'flash_available' : 512 - ((35 + 8 + 10 + 10)*4) # Softdevice 5.0  uses 35 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
-#    'flash_available' : 512 - ((38 + 8 + 2 +16)*4) # Softdevice 6.x  uses 38 pages of flash, bootloader 8, FS 2, no code. Each page is 4 kb.
+    #'flash_available' : 512 - ((35 + 8 + 10 + 10)*4) # Softdevice 5.0  uses 35 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
+    #'flash_available' : 512 - ((38 + 8 + 2 +16)*4) # Softdevice 6.x  uses 38 pages of flash, bootloader 8, FS 2, no code. Each page is 4 kb.
     'address' : 0x60000000, # second bank (for second 'drive' of storage module, see jsflash.c) in external spiflash (see below)
     'pages' : 512, # Entire 2MB of external flash
-
   },
 };
 
@@ -113,9 +94,6 @@ devices = {
               'pin_mosi' : 'D13',
               'pin_miso' : 'D11',
               'pin_cs' : 'D12',
-  ##            'pin_wp' : '',
-  ##            'pin_hold' : '',
-  ##            'pin_rst' : '', # no reset but this is HOLD pin for XENON, we want it set to 1
               'size' : 2048*1024, # 2MB
               'memmap_base' : 0x60000000 # map into the address space (in software)
     },
@@ -134,8 +112,6 @@ devices = {
 
 def get_pins():
   pins = pinutils.generate_pins(0,31) # 32 General Purpose I/O Pins.
-#  pinutils.findpin(pins, "PD9", True)["functions"]["NFC1"]=0;
-#  pinutils.findpin(pins, "PD10", True)["functions"]["NFC2"]=0;
   pinutils.findpin(pins, "PD2", True)["functions"]["ADC1_IN0"]=0;
   pinutils.findpin(pins, "PD3", True)["functions"]["ADC1_IN1"]=0;
   pinutils.findpin(pins, "PD4", True)["functions"]["ADC1_IN2"]=0;
@@ -150,5 +126,4 @@ def get_pins():
   # everything is non-5v tolerant
   for pin in pins:
     pin["functions"]["3.3"]=0;
-  #The boot/reset button will function as a reset button in normal operation. Pin reset on PD21 needs to be enabled on the nRF52832 device for this to work.
   return pins
