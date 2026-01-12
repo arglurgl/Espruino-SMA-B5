@@ -55,7 +55,17 @@ info = {
       'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',     
 
       # graphics/LCD settings:
-      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1'
+      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
+      'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1', # Creates an internal Graphics object (graphicsInternal struct in C) that persists across execution
+      'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'', # Prevents the variable g from being saved to flash storage (saving flash space)
+      # includes and sources for B5SDK12:
+      'INCLUDE += -I$(ROOT)/libs/B5SDK12 -I$(ROOT)/libs/misc',
+      'WRAPPERSOURCES += libs/B5SDK12/jswrap_B5SDK12.c',
+      'JSMODULESOURCES += libs/js/banglejs/locale.min.js', # we might want to use our own locale later, for now just include the original Bangle.js one
+      # might use these via code from bangle.js left in jswrap_B5SDK12.c/h later:
+      #'SOURCES += libs/misc/nmea.c',
+      'SOURCES += libs/misc/stepcount.c', # needed for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c
+      'DEFINES+=-DHOME_BTN=1', # fixup for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c      
    ]
  }
 };
