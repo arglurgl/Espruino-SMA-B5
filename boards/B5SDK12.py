@@ -66,6 +66,10 @@ info = {
       #'SOURCES += libs/misc/nmea.c',
       'SOURCES += libs/misc/stepcount.c', # needed for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c
       'DEFINES+=-DHOME_BTN=1', # fixup for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c      
+      
+      # activating this will create a Bangle functionality such as screen off timeout, and the 'Bangle' object in JS
+      'DEFINES += -DBANGLEJS',
+      'INCLUDE += -I$(ROOT)/libs/banglejs',
    ]
  }
 };
