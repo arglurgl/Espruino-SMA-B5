@@ -4455,12 +4455,21 @@ bool jswrap_banglejs_idle() {
         if (tapInfo&16) string="right";
         if (tapInfo&32) string="left";
 #else
+#ifdef BOARD_SMAB5
+        if (tapInfo&2) string="back";
+        if (tapInfo&1) string="front";
+        if (tapInfo&8) string="top";
+        if (tapInfo&4) string="bottom";
+        if (tapInfo&16) string="right";
+        if (tapInfo&32) string="left";        
+#else
         if (tapInfo&1) string="front";
         if (tapInfo&2) string="back";
         if (tapInfo&4) string="top";
         if (tapInfo&8) string="bottom";
         if (tapInfo&16) string="left";
         if (tapInfo&32) string="right";
+#endif
 #endif
 #endif
         int n = (tapInfo&0x80)?2:1;
