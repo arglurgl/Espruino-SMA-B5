@@ -1543,6 +1543,10 @@ void peripheralPollHandler() {
     newx = -newx; //consistent directions with Bangle
     newz = -newz;
 #endif
+#ifdef BOARD_SMAB5
+    newx = -newx; //flip x and y for SMA B5
+    newy = -newy;
+#endif
 #ifdef ACCEL_DEVICE_KX126
     newy = -newy;
 #endif
