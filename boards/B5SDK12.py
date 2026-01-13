@@ -122,6 +122,11 @@ devices = {
             'pin_mosi' : 'D3',
             'pin_bl' : 'D29',
     },
+    'ACCEL' : {
+          'device' : 'KX023', 'addr' : 0x1f, # this actually is a KX022 but it is close enough to work
+          'pin_sda' : 'D17',
+          'pin_scl' : 'D18'
+        },
 };
 
 

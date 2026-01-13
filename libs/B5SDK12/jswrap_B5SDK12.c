@@ -665,6 +665,12 @@ JshI2CInfo i2cInternal;
 #ifdef ID205
 #define HOME_BTN 1
 #endif
+
+#ifdef BOARD_SMAB5
+JshI2CInfo i2cInternal;
+#define ACCEL_I2C &i2cInternal
+#endif
+
 // =========================================================================
 
 #if HOME_BTN==1
