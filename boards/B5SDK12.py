@@ -28,7 +28,8 @@ info = {
    'libraries' : [
      'BLUETOOTH',
      'GRAPHICS', 
-     'LCD_SPI'
+     'LCD_SPI',
+     'JIT'
    ],
    'makefile' : [
       'DEFINES += -DBOARD_SMAB5', # not sure how board defines usually work so adding this manually here
@@ -37,6 +38,7 @@ info = {
       'DEFINES += -DCONFIG_NFCT_PINS_AS_GPIOS', # Allow using NFC pins for gpio
       'DEFINES+=-DBTN1_IS_TOUCH=1', # BTN1 is a touch button
       'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
+      'DEFINES+=-DAPP_TIMER_OP_QUEUE_SIZE=6', # Bangle.js accelerometer poll handler needs something else in queue size
 
       # generic defines:
       'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
@@ -52,12 +54,21 @@ info = {
       'DEFINES += -DBUTTONPRESS_TO_REBOOT_BOOTLOADER', # to have some way to get out of DFU mode, since we have no reset/power cycle
       'NRF_BL_DFU_INSECURE=1', # allow insecure DFU (no signature checking)
       'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
-      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',     
+      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',   
+
+      # try to save some RAM/flash, taken from Bangle.js settings:
+      'DEFINES+=-DESPR_NO_SOFTWARE_SERIAL=1',
+      'DEFINES+=-DESPR_PACKED_SYMPTR', # Pack builtin symbols' offset into pointer to save 2 bytes/symbol
+      'BLACKLIST=boards/BANGLEJS.blocklist', # force some stuff to be removed to save space  
+      'DEFINES+=-DESPR_NO_DUMP_STATE=1',
+      'DEFINES+=-DSAVE_ON_FLASH_MATH',
 
       # graphics/LCD settings:
       'DEFINES+=-DUSE_FONT_6X8 -DESPR_GRAPHICS_12BIT -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
       'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1', # Creates an internal Graphics object (graphicsInternal struct in C) that persists across execution
       'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'', # Prevents the variable g from being saved to flash storage (saving flash space)
+      'DEFINES+=-DGRAPHICS_ANTIALIAS',
+
       # includes and sources for B5SDK12:
       'INCLUDE += -I$(ROOT)/libs/B5SDK12 -I$(ROOT)/libs/misc',
       'WRAPPERSOURCES += libs/B5SDK12/jswrap_B5SDK12.c',
@@ -84,7 +95,7 @@ chip = {
   'speed' : 64,
   'usart' : 1,
   'spi' : 1,
-  'i2c' : 1,
+  'i2c' : 0, # hardware supports 1, but we don't use these
   'adc' : 1,
   'dac' : 0,
   'saved_code' : {
