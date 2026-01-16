@@ -39,6 +39,8 @@ info = {
       'DEFINES+=-DBTN1_IS_TOUCH=1', # BTN1 is a touch button
       'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
       'DEFINES+=-DAPP_TIMER_OP_QUEUE_SIZE=6', # Bangle.js accelerometer poll handler needs something else in queue size
+      'DEFINES+=-DCUSTOM_GETBATTERY=jswrap_banglejs_getBattery', # this functions is located in jswrap_B5SDK12.c
+      'DEFINES+=-DESPR_BATTERY_FULL_VOLTAGE=0.320',
 
       # generic defines:
       'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
@@ -137,6 +139,10 @@ devices = {
           'device' : 'KX023', 'addr' : 0x1f, # this actually is a KX022 but it is close enough to work
           'pin_sda' : 'D17',
           'pin_scl' : 'D18'
+        },
+    'BAT' : {
+          'pin_charging' : 'D24', # active low, input pullup
+          'pin_voltage' : 'D4'
         },
 };
 
