@@ -1,5 +1,18 @@
 # This is the branch you need to pull/checkout for SMA-B5 hardware
 
+## SMA B5 Notes
+
+What works in firmware:
+* Hardware
+    * LCD (bootloader and Espruino)
+        * Compiled-in 12 bpp SPI LCD driver
+        * Compiled-in [Graphics class](https://www.espruino.com/Reference#Graphics)
+        * Paletted images: 3 bit / 8 color RGB, 4 bit / 16 color MAC, 8 bit / 256 color Web (use WebIDE upload image to storage function)
+    * Accelerometer including [tap events](https://www.espruino.com/Reference#t_l_Bangle_tap), [twist events](https://www.espruino.com/Reference#t_l_Bangle_twist), etc.
+* Power save
+* [Bangle Class](https://www.espruino.com/Reference#Bangle)
+
+
 Espruino JavaScript for Microcontrollers
 ========================================
 <pre>
