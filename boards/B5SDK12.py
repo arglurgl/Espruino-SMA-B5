@@ -55,7 +55,7 @@ info = {
       'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0x8C,0x91',     
 
       # graphics/LCD settings:
-      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
+      'DEFINES+=-DUSE_FONT_6X8 -DESPR_GRAPHICS_12BIT -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
       'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1', # Creates an internal Graphics object (graphicsInternal struct in C) that persists across execution
       'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'', # Prevents the variable g from being saved to flash storage (saving flash space)
       # includes and sources for B5SDK12:
