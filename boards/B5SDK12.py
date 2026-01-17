@@ -69,7 +69,7 @@ info = {
       'DEFINES+=-DUSE_FONT_6X8 -DESPR_GRAPHICS_12BIT -DGRAPHICS_PALETTED_IMAGES=1 -DGRAPHICS_FAST_PATHS=1',
       'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1', # Creates an internal Graphics object (graphicsInternal struct in C) that persists across execution
       'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'', # Prevents the variable g from being saved to flash storage (saving flash space)
-      'DEFINES+=-DGRAPHICS_ANTIALIAS',
+      #'DEFINES+=-DGRAPHICS_ANTIALIAS', # this does not add much prettiness but slows down drawing
 
       # includes and sources for B5SDK12:
       'INCLUDE += -I$(ROOT)/libs/B5SDK12 -I$(ROOT)/libs/misc',
