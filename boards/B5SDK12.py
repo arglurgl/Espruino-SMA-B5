@@ -75,9 +75,10 @@ info = {
       'INCLUDE += -I$(ROOT)/libs/B5SDK12 -I$(ROOT)/libs/misc',
       'WRAPPERSOURCES += libs/B5SDK12/jswrap_B5SDK12.c',
       'JSMODULESOURCES += libs/js/banglejs/locale.min.js', # we might want to use our own locale later, for now just include the original Bangle.js one
-      # might use these via code from bangle.js left in jswrap_B5SDK12.c/h later:
-      #'SOURCES += libs/misc/nmea.c',
-      'SOURCES += libs/misc/stepcount.c', # needed for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c
+      # used for accelerometer stepcounter and GPS NMEA parsing:
+      'SOURCES += libs/misc/nmea.c',
+      'SOURCES += libs/misc/stepcount.c',
+   
       'DEFINES+=-DHOME_BTN=1', # fixup for the current non-weeded-out bangle.js code in jswrap_B5SDK12.c      
       
       # activating this will create a Bangle functionality such as screen off timeout, and the 'Bangle' object in JS
@@ -143,6 +144,13 @@ devices = {
     'BAT' : {
           'pin_charging' : 'D24', # active low, input pullup
           'pin_voltage' : 'D4'
+        },
+    # GPS: CASIC AT6558-5N-32-1C510800, URANUS5,V5.1.0.0, 2018-04-18,10:28:16, same as on Bangle.js 2
+    'GPS' : {
+          'device' : 'Casic URANUS',
+          'pin_en' : 'D7',
+          'pin_rx' : 'D28',
+          'pin_tx' : 'D27'
         },
 };
 

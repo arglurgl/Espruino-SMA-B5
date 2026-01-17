@@ -669,6 +669,8 @@ JshI2CInfo i2cInternal;
 #ifdef BOARD_SMAB5
 JshI2CInfo i2cInternal;
 #define ACCEL_I2C &i2cInternal
+#define GPS_UART EV_SERIAL1
+#define GPS_CASIC 1 // handle decoding of 'CASIC' packets from the GPS
 #endif
 
 // =========================================================================
@@ -3817,6 +3819,10 @@ NO_INLINE void jswrap_banglejs_hwinit() {
   jswrap_banglejs_pwrBacklight(true); // backlight on
   jshDelayMicroseconds(10000);
 #endif
+#ifdef BOARD_SMAB5
+  // Ensure peripherals are forced off (GPIO can be open drain)
+  jswrap_banglejs_pwrGPS(false); // GPS off
+#endif
 #endif //EMULATED
   // we need ESPR_GRAPHICS_INTERNAL=1
 
@@ -4780,7 +4786,7 @@ bool jswrap_banglejs_idle() {
 /*JSON{
   "type" : "EV_SERIAL1",
   "generate" : "jswrap_banglejs_gps_character",
-  "#if" : "defined(BANGLEJS_F18) || defined(DTNO1_F5)  || defined(BANGLEJS_Q3)"
+  "#if" : "defined(BANGLEJS_F18) || defined(DTNO1_F5)  || defined(BANGLEJS_Q3) || defined(BOARD_SMAB5)"
 }*/
 bool jswrap_banglejs_gps_character(char ch) {
 #ifdef GPS_PIN_RX
@@ -4851,7 +4857,7 @@ bool jswrap_banglejs_gps_character(char ch) {
       gpsLine[gpsLineLength - 1] = 0;
       if (nmea_decode(&gpsFix, (char *)gpsLine)) {
         bangleTasks |= JSBT_GPS_DATA;
-#ifdef BANGLEJS_Q3
+#if defined(BANGLEJS_Q3) || defined(BOARD_SMAB5)
         if (gpsFix.packetCount == 1) { // first packet
           // https://github.com/espruino/Espruino/issues/2354 - on newer Bangle.js, speed/time may not be reported
           // as there's no RMC packet by default. If we detect this in 1st packet send a command to fix it
