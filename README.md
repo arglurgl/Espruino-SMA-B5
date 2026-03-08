@@ -1,3 +1,18 @@
+# This is the branch you need to pull/checkout for ID205 (*not* ID205L) hardware
+
+## ID205 Notes
+This branch fixes and extends the ID205 support present in official Espruino, which does not seem to be actively maintained.
+
+What works in firmware:
+* Hardware
+    * LCD (Espruino, not bootloader)
+        * LCD seems to have backlight issues/bugs, E.reboot() seems to help
+        * Compiled-in LCD driver
+        * Compiled-in [Graphics class](https://www.espruino.com/Reference#Graphics)
+        * Paletted images: 3 bit / 8 color RGB, 4 bit / 16 color MAC, 8 bit / 256 color Web (use WebIDE upload image to storage function)
+* Power save
+* [Bangle Class](https://www.espruino.com/Reference#Bangle)
+
 Espruino JavaScript for Microcontrollers
 ========================================
 <pre>
