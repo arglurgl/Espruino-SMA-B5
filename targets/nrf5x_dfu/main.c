@@ -121,6 +121,8 @@ void turn_off() {
   set_led_state(0,0);
 #if defined(BTN2_PININDEX)
   nrf_gpio_cfg_sense_set(BTN2_PININDEX, NRF_GPIO_PIN_NOSENSE);
+#endif
+#if defined(BTN3_PININDEX)
   nrf_gpio_cfg_sense_set(BTN3_PININDEX, NRF_GPIO_PIN_NOSENSE);
 #endif
   nrf_gpio_cfg_sense_input(pinInfo[BTN1_PININDEX].pin, NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);

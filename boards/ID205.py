@@ -24,7 +24,7 @@ info = {
 # 'default_console_rx' : "D8",
 # 'default_console_baudrate' : "9600",
  'variables' : 2500, # How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
-# 'bootloader' : 1,
+ 'bootloader' : 1,
  'binary_name' : 'espruino_%v_id205.hex',
  'build' : {
    'optimizeflags' : '-Os',
@@ -51,6 +51,9 @@ info = {
      'WRAPPERSOURCES += libs/banglejs/jswrap_bangle.c',
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
      'DEFINES += -DBANGLEJS',
+
+    'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
+    'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
 
      'NRF_SDK15=1'
    ]
