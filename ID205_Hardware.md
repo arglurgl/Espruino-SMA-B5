@@ -49,7 +49,8 @@ Touch: IT7259
 | 14  | D20              |
 | 15  | GND              |
 
-## Flash
+## Flash 
+(XT25F64B, full part name: XT25F64BW016)
 
 | Pin        | NRF52    |
 | ---------- | -------- |
@@ -59,6 +60,14 @@ Touch: IT7259
 | HOLD#(IO3) | NC, 3.3V |
 | SCLK       | D36      |
 | SI(IO0)    | D38      |
+
+## Accelerometer
+| Name     | NRF52 |
+| -------- | ----- |
+| SCL      | D14   |
+| SDO/ADDR | D40   |
+| SDI/SDA  | D11   |
+| INT1     | D12?  |
 
 ## Labeled Testpoints
 | Name | NRF52   |
