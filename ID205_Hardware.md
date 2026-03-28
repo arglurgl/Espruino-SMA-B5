@@ -31,23 +31,23 @@ Touch: IT7259
 
 ## Heartrate / Buttons Connector
 
-| Pin | NRF52 / Function |
-| --- | ---------------- |
-| 1   | D41              |
-| 2   | VDD              |
-| 3   | GND              |
-| 4   | GND              |
-| 5   | BAT+             |
-| 6   | BAT+             |
-| 7   | D7 / Button      |
-| 8   | ? 0V             |
-| 9   | D5 / Button      |
-| 10  | D16              |
-| 11  | D27              |
-| 12  | D24              |
-| 13  | D22              |
-| 14  | D20              |
-| 15  | GND              |
+| Pin | NRF52 / Function         |
+| --- | ------------------------ |
+| 1   | D41                      |
+| 2   | VDD                      |
+| 3   | GND                      |
+| 4   | GND                      |
+| 5   | BAT+                     |
+| 6   | BAT+                     |
+| 7   | D7 / Button              |
+| 8   | ? 0V                     |
+| 9   | D5 / Button              |
+| 10  | D16, Series R after Flex |
+| 11  | D27                      |
+| 12  | D24, Series R after Flex |
+| 13  | D22                      |
+| 14  | D20, Series R after Flex |
+| 15  | GND                      |
 
 ## Flash 
 (XT25F64B, full part name: XT25F64BW016)
