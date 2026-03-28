@@ -70,6 +70,12 @@ Touch: IT7259
 | INT1     | D12?  |
 | nCS      | D13   |
 
+## Light Sensor
+| Name    | NRF52                                 |
+| ------- | ------------------------------------- |
+| nEnable | D44 (low = enable, has pullup to VDD) |
+| Signal  | D29                                   |
+
 ## Labeled Testpoints
 | Name | NRF52   |
 | ---- | ------- |
