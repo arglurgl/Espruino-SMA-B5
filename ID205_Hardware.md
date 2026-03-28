@@ -68,6 +68,7 @@ Touch: IT7259
 | SDO/ADDR | D40   |
 | SDI/SDA  | D11   |
 | INT1     | D12?  |
+| nCS      | D13   |
 
 ## Labeled Testpoints
 | Name | NRF52   |
