@@ -24,7 +24,7 @@ info = {
 # 'default_console_rx' : "D8",
 # 'default_console_baudrate' : "9600",
  'variables' : 2500, # How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
- 'bootloader' : 1,
+ #'bootloader' : 1, # bootloader seems to have issues when flashed via SWD, diabled for dev work
  'binary_name' : 'espruino_%v_id205.hex',
  'build' : {
    'optimizeflags' : '-Os',
@@ -40,14 +40,22 @@ info = {
      'DEFINES += -DBUTTONPRESS_TO_REBOOT_BOOTLOADER',
      'DEFINES+=-DBLUETOOTH_NAME_PREFIX=\'"Bangle.js"\'',
      'DEFINES+=-DCUSTOM_GETBATTERY=jswrap_banglejs_getBattery',
+     'DEFINES+=-DESPR_BATTERY_FULL_VOLTAGE=0.2021484375', # TODO: check with full battery
      'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'',
      'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1',
-     'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES -DESPR_GRAPHICS_12BIT',
+     'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES -DESPR_GRAPHICS_12BIT -DGRAPHICS_ANTIALIAS',
      'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
      'INCLUDE += -I$(ROOT)/libs/banglejs -I$(ROOT)/libs/misc',
+     
+     # enable bangle storage
+     'SOURCES += libs/banglejs/banglejs2_storage_default.c',
+     'DEFINES += -DESPR_STORAGE_INITIAL_CONTENTS=1', # use banglejs2_storage_default
+     'DEFINES += -DESPR_USE_STORAGE_CACHE=32', # Add a 32 entry cache to speed up finding files
+          
       # used for accelerometer stepcounter and GPS NMEA parsing:
      'SOURCES += libs/misc/nmea.c',
      'SOURCES += libs/misc/stepcount.c',
+
      'WRAPPERSOURCES += libs/banglejs/jswrap_bangle.c',
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
      'DEFINES += -DBANGLEJS',
@@ -74,9 +82,9 @@ chip = {
   'adc' : 1,
   'dac' : 0,
   'saved_code' : {
-    'address' : ((246 - 10) * 4096), # Bootloader takes pages 248-255, FS takes 246-247
+    'address' : ((246 - 130) * 4096), # Bootloader takes pages 248-255, FS takes 246-247
     'page_size' : 4096,
-    'pages' : 10,
+    'pages' : 130,
     'flash_available' : 1024 - ((31 + 8 + 2 + 10)*4) # Softdevice uses 31 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
   },
 };
@@ -84,6 +92,7 @@ chip = {
 devices = {
   'BTN1' : { 'pin' : 'D5', 'pinstate' : 'IN_PULLDOWN' }, # Pin negated in software
   'BTN2' : { 'pin' : 'D7', 'pinstate' : 'IN_PULLDOWN' }, # Pin negated in software
+  'BTN3' : { 'pin' : 'D45', 'pinstate' : 'IN_PULLDOWN' }, # fake button to make bangle code work, D45 is actually the charge indicator
 #  'LED1' : { 'pin' : 'D13' }, # Pin negated in software
   'VIBRATE' : { 'pin' : 'D8' }, # Pin negated in software
   'LCD' : {
