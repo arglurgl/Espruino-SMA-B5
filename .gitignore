@@ -80,3 +80,4 @@ arm-gnu-toolchain*
 *.code-workspace
 /espruino_embedded.*
 targetlibs/nrf5x_12/components/toolchain/gcc/gcc_startup_nrf52.o
+/pics
