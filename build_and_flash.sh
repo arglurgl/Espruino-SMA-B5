@@ -12,4 +12,5 @@ make clean
 BOARD=ID205 RELEASE=1 make
 
 # flash espruino to the device
-nrfutil device program --options reset=RESET_DEFAULT,chip_erase_mode=ERASE_ALL --firmware bin/espruino_*_id205.hex
+#nrfutil device program --options reset=RESET_DEFAULT,chip_erase_mode=ERASE_ALL --firmware bin/espruino_*_id205.hex
+nrfutil device program --options reset=RESET_DEFAULT,chip_erase_mode=ERASE_RANGES_TOUCHED_BY_FIRMWARE --firmware bin/espruino_*_id205.hex
