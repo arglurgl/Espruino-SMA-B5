@@ -1096,6 +1096,9 @@ void jswrap_banglejs_pwrBacklight(bool on) {
   jswrap_banglejs_ioWr(IOEXP_LCD_BACKLIGHT, !on);
 #endif
 #ifdef LCD_BL
+  #ifdef ID205
+    jshPinOutput(ID205_PIN_LCD_BL_POWER,on); // enable/disable backlight power supply
+  #endif
   jshPinOutput(LCD_BL, on);
 #endif
 #ifdef LCD_CONTROLLER_LPM013M126
@@ -3702,9 +3705,9 @@ NO_INLINE void jswrap_banglejs_hwinit() {
   jshPinOutput(18,0); // what's this?
 #endif
 #ifdef ID205
-  jshPinOutput(3,1); // general VDD power?
-  jshPinOutput(46,0); // What's this? Who knows! But it stops screen flicker and makes the touchscreen work nicely
-  jshPinOutput(LCD_BL,1); // Backlight
+  jshPinOutput(ID205_PIN_LCD_BL_POWER,1); // enable backlight power supply
+  jshPinOutput(ID205_PIN_TOUCH_LCD_POWER,1); // enable LCD and touch power supply
+  jshPinOutput(LCD_BL,1); // enable backlight switch transistor
 #endif
 #ifndef EMULATED
 #ifdef NRF52832

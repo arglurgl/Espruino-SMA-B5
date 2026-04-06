@@ -366,7 +366,10 @@ void lcd_flip() {
   ymax=0;
 }
 void lcd_init() {
-  jshPinOutput(3,1); // general VDD power?
+  #ifdef ID205
+    jshPinOutput(ID205_PIN_LCD_BL_POWER,1); // enable backlight power supply
+    jshPinOutput(ID205_PIN_TOUCH_LCD_POWER,1); // enable LCD and touch power supply
+  #endif
   jshPinOutput(LCD_BL, LCD_BL_ON); // backlight
   // LCD Init 1
   jshPinOutput(LCD_SPI_CS,1);

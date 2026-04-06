@@ -60,10 +60,14 @@ info = {
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
      'DEFINES += -DBANGLEJS',
 
-    'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
-    'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
+     'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
+     'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
 
-     'NRF_SDK15=1'
+     'NRF_SDK15=1',
+
+     # ID205 specific hardware defines
+     'DEFINES += -DID205_PIN_LCD_BL_POWER=3 -DID205_PIN_TOUCH_LCD_POWER=46'
+
    ]
  }
 };
