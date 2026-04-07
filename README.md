@@ -6,7 +6,6 @@ This branch fixes and extends the ID205 support present in official Espruino, wh
 What works in firmware:
 * Hardware
     * LCD (Espruino and bootloader, but bootloader is upside-down)
-        * LCD seems to have backlight issues/bugs, E.reboot() seems to help
         * Compiled-in LCD driver
         * Compiled-in [Graphics class](https://www.espruino.com/Reference#Graphics)
         * Paletted images: 3 bit / 8 color RGB, 4 bit / 16 color MAC, 8 bit / 256 color Web (use WebIDE upload image to storage function)

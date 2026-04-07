@@ -40,7 +40,7 @@ info = {
      'DEFINES += -DBUTTONPRESS_TO_REBOOT_BOOTLOADER',
      'DEFINES+=-DBLUETOOTH_NAME_PREFIX=\'"Bangle.js"\'',
      'DEFINES+=-DCUSTOM_GETBATTERY=jswrap_banglejs_getBattery',
-     'DEFINES+=-DESPR_BATTERY_FULL_VOLTAGE=0.2021484375', # TODO: check with full battery
+     'DEFINES+=-DESPR_BATTERY_FULL_VOLTAGE=0.2144', # TODO: check with full battery
      'DEFINES+=-DDUMP_IGNORE_VARIABLES=\'"g\\0"\'',
      'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1',
      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES -DESPR_GRAPHICS_12BIT -DGRAPHICS_ANTIALIAS',
@@ -63,11 +63,8 @@ info = {
      'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
 
-     'NRF_SDK15=1',
-
-     # ID205 specific hardware defines
-     'DEFINES += -DID205_PIN_LCD_BL_POWER=3 -DID205_PIN_TOUCH_LCD_POWER=46'
-
+     'NRF_SDK15=1', # activate for SDK15, defaults to SDK12
+     'BOOTLOADER_SETTINGS_FAMILY=NRF52840',
    ]
  }
 };
@@ -107,11 +104,15 @@ devices = {
             'pin_rst' : 'D2',
             'pin_sck' : 'D30',
             'pin_mosi' : 'D18',
-            'pin_bl' : 'D35', # backlight pwm
+            'pin_bl' : 'D35', # backlight pwm, active high
           },
   'BAT' : {
             'pin_charging' : 'D45', # active low
             'pin_voltage' : 'D4'
+          },
+  'MISC' : {
+             'pin_lcd_bl_driver' : 'D3', # power for backlight, controlled by a driver IC, active high
+             'pin_lcd_touch_vdd' : 'D46' # power for LCD and touchscreen, controlled by a FET, active high
           },
 };
 

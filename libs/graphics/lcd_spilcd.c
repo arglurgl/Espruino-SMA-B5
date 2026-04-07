@@ -366,8 +366,8 @@ void lcdInit_SPILCD(JsGraphics *gfx) {
 
 #ifdef LCD_BL
   #ifdef ID205
-    jshPinOutput(ID205_PIN_LCD_BL_POWER,1); // enable backlight power supply
-    jshPinOutput(ID205_PIN_TOUCH_LCD_POWER,1); // enable LCD and touch power supply
+    jshPinOutput(MISC_PIN_LCD_BL_DRIVER,1); // enable backlight power supply
+    jshPinOutput(MISC_PIN_LCD_TOUCH_VDD,1); // enable LCD and touch power supply
   #endif
   jshPinOutput(LCD_BL, 1);
 #endif

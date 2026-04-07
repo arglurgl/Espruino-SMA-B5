@@ -1097,7 +1097,7 @@ void jswrap_banglejs_pwrBacklight(bool on) {
 #endif
 #ifdef LCD_BL
   #ifdef ID205
-    jshPinOutput(ID205_PIN_LCD_BL_POWER,on); // enable/disable backlight power supply
+    jshPinOutput(MISC_PIN_LCD_BL_DRIVER,on); // enable/disable backlight power supply
   #endif
   jshPinOutput(LCD_BL, on);
 #endif
@@ -3705,8 +3705,8 @@ NO_INLINE void jswrap_banglejs_hwinit() {
   jshPinOutput(18,0); // what's this?
 #endif
 #ifdef ID205
-  jshPinOutput(ID205_PIN_LCD_BL_POWER,1); // enable backlight power supply
-  jshPinOutput(ID205_PIN_TOUCH_LCD_POWER,1); // enable LCD and touch power supply
+  jshPinOutput(MISC_PIN_LCD_BL_DRIVER,1); // enable backlight power supply
+  jshPinOutput(MISC_PIN_LCD_TOUCH_VDD,1); // enable LCD and touch power supply
   jshPinOutput(LCD_BL,1); // enable backlight switch transistor
 #endif
 #ifndef EMULATED
