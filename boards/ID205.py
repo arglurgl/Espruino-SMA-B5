@@ -48,8 +48,8 @@ info = {
      'INCLUDE += -I$(ROOT)/libs/banglejs -I$(ROOT)/libs/misc',
      
      # enable bangle storage
-     'SOURCES += libs/banglejs/banglejs2_storage_default.c',
-     'DEFINES += -DESPR_STORAGE_INITIAL_CONTENTS=1', # use banglejs2_storage_default
+     #'SOURCES += libs/banglejs/banglejs2_storage_default.c',
+     #'DEFINES += -DESPR_STORAGE_INITIAL_CONTENTS=1', # use banglejs2_storage_default
      'DEFINES += -DESPR_USE_STORAGE_CACHE=32', # Add a 32 entry cache to speed up finding files
           
       # used for accelerometer stepcounter and GPS NMEA parsing:
@@ -65,6 +65,9 @@ info = {
 
      'NRF_SDK15=1', # activate for SDK15, defaults to SDK12
      'BOOTLOADER_SETTINGS_FAMILY=NRF52840',
+
+     'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
+
    ]
  }
 };
@@ -83,9 +86,9 @@ chip = {
   'adc' : 1,
   'dac' : 0,
   'saved_code' : {
-    'address' : ((246 - 130) * 4096), # Bootloader takes pages 248-255, FS takes 246-247
-    'page_size' : 4096,
-    'pages' : 130,
+    'address' : 0x60000000, # put this in external spiflash (see SPIFLASH below)
+    'page_size' : 256,
+    'pages' : 32*1024, # Entire 8MB of external flash
     'flash_available' : 1024 - ((31 + 8 + 2 + 10)*4) # Softdevice uses 31 pages of flash, bootloader 8, FS 2, code 10. Each page is 4 kb.
   },
 };
@@ -109,6 +112,14 @@ devices = {
   'BAT' : {
             'pin_charging' : 'D45', # active low
             'pin_voltage' : 'D4'
+          },
+  'SPIFLASH' : {
+            'pin_cs' : 'D15',
+            'pin_sck' : 'D36',
+            'pin_mosi' : 'D38',
+            'pin_miso' : 'D17',
+            'size' : 8*1024*1024, # 8MB
+            'memmap_base' : 0x60000000 # map into the address space (in software)
           },
   'MISC' : {
              'pin_lcd_bl_driver' : 'D3', # power for backlight, controlled by a driver IC, active high
