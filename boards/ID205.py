@@ -47,9 +47,16 @@ info = {
      'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
      'INCLUDE += -I$(ROOT)/libs/banglejs -I$(ROOT)/libs/misc',
      
-     # enable bangle storage
-     #'SOURCES += libs/banglejs/banglejs2_storage_default.c',
-     #'DEFINES += -DESPR_STORAGE_INITIAL_CONTENTS=1', # use banglejs2_storage_default
+     # enable bangle storage factory reset and needed fonts
+     'SOURCES += libs/banglejs/banglejs2_storage_default.c',
+     'DEFINES += -DESPR_STORAGE_INITIAL_CONTENTS=1', # use banglejs2_storage_default
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_14.c',
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_17.c',
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_22.c',
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_28.c',
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_6x15.c',
+     'WRAPPERSOURCES += libs/graphics/jswrap_font_12x20.c',
+
      'DEFINES += -DESPR_USE_STORAGE_CACHE=32', # Add a 32 entry cache to speed up finding files
           
       # used for accelerometer stepcounter and GPS NMEA parsing:

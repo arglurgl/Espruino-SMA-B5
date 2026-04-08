@@ -6431,7 +6431,7 @@ with a swipe by using:
       ["noReboot","bool","Do not reboot the watch when done (default false, so will reboot)"]
     ],
     "generate" : "jswrap_banglejs_factoryReset",
-    "#if" : "defined(BANGLEJS_Q3) || defined(EMULATED) || defined(DICKENS)"
+    "#if" : "defined(BANGLEJS_Q3) || defined(EMULATED) || defined(DICKENS) || defined(ID205)"
 }
 
 Erase all storage and reload it with the default contents.
