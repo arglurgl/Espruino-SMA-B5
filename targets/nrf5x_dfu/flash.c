@@ -46,13 +46,13 @@ typedef struct {
 
 /// Read data while sending 0
 static void spiFlashRead(unsigned char *rx, unsigned int len) {
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
   for (unsigned int i=0;i<len;i++) {
     int result = 0;
     for (int bit=0;bit<8;bit++) {
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-      result = (result<<1) | nrf_gpio_pin_read((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin);
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      result = (result<<1) | NRF_GPIO_PIN_READ_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
     }
     rx[i] = result;
   }
@@ -62,25 +62,25 @@ static void spiFlashWrite(unsigned char *tx, unsigned int len) {
   for (unsigned int i=0;i<len;i++) {
     int data = tx[i];
     for (int bit=7;bit>=0;bit--) {
-      nrf_gpio_pin_write((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, (data>>bit)&1 );
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_WRITE_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, (data>>bit)&1 );
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
     }
   }
 }
 
 static void spiFlashWriteCS(unsigned char *tx, unsigned int len) {
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   spiFlashWrite(tx,len);
-  nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
 }
 
 static unsigned char spiFlashStatus() {
   unsigned char buf = 5;
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   spiFlashWrite(&buf, 1);
   spiFlashRead(&buf, 1);
-  nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   return buf;
 }
 
@@ -152,10 +152,10 @@ void spiFlashReadAddr(unsigned char *buf, uint32_t addr, uint32_t len) {
   b[1] = addr>>16;
   b[2] = addr>>8;
   b[3] = addr;
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   spiFlashWrite(b,4);
   spiFlashRead((unsigned char*)buf,len);
-  nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
 }
 
 void intFlashErase(uint32_t addr) {

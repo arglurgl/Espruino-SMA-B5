@@ -473,13 +473,13 @@ anyway because we're always expecting to have read something.  */
 uint32_t spiFlashLastAddress = 0;
 /// Read data while sending 0
 static void spiFlashRead(unsigned char *rx, unsigned int len) {
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
   for (unsigned int i=0;i<len;i++) {
     int result = 0;
     for (int bit=0;bit<8;bit++) {
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-      result = (result<<1) | nrf_gpio_pin_read((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin);
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      result = (result<<1) | NRF_GPIO_PIN_READ_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
     }
     rx[i] = result;
   }
@@ -490,23 +490,21 @@ static void spiFlashRead(unsigned char *rx, unsigned int len) {
 static void spiFlashRead2x(unsigned char *rx, unsigned int len) {
   assert((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin<32); // port 0
   assert((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin<32); // port 0
-  nrf_gpio_cfg_input((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin, NRF_GPIO_PIN_NOPULL);
-  //NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0); // High-Z input
+  NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0); // High-Z input
   //#define NRF_GPIO_PIN_READ_FAST(PIN) ((NRF_P0->IN >> (PIN))&1)
   //#define NRF_GPIO_PIN_CNF(PIN,value) NRF_P0->PIN_CNF[PIN]=value;
   for (unsigned int i=0;i<len;i++) {
     int result = 0;
     #pragma GCC unroll 4
     for (int bit=0;bit<4;bit++) {
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
       uint32_t io = NRF_P0->IN;
       result = (result<<2) | ((io>>(pinInfo[SPIFLASH_PIN_MISO].pin-1))&2) | ((io>>pinInfo[SPIFLASH_PIN_MOSI].pin)&1);
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
     }
     rx[i] = result;
   }
-  nrf_gpio_cfg_output((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
-  //NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0x303); // high drive output
+  NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0x303); // high drive output
 }
 #endif
 
@@ -514,24 +512,24 @@ static void spiFlashWrite(unsigned char *tx, unsigned int len) {
   for (unsigned int i=0;i<len;i++) {
     int data = tx[i];
     for (int bit=7;bit>=0;bit--) {
-      nrf_gpio_pin_write((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, (data>>bit)&1 );
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_WRITE_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, (data>>bit)&1 );
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
     }
   }
 }
 static void spiFlashWrite32(uint32_t data) {
   for (int bit=31;bit>=0;bit--) {
-    nrf_gpio_pin_write((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, data & 0x80000000 );
+    NRF_GPIO_PIN_WRITE_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, data & 0x80000000 );
     data<<=1;
-    nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-    nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+    NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+    NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
   }
 }
 static void spiFlashWriteCS(unsigned char *tx, unsigned int len) {
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   spiFlashWrite(tx,len);
-  nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
 }
 /* Get SPI flash status bits:
 
@@ -546,10 +544,10 @@ SRWD - status reg write protect
 */
 static unsigned char spiFlashStatus() {
   unsigned char buf = 5;
-  nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   spiFlashWrite(&buf, 1);
   spiFlashRead(&buf, 1);
-  nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+  NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
   return buf;
 }
 
@@ -601,7 +599,7 @@ static void spiFlashWakeUp() {
 }
 void spiFlashSleep() {
   if (spiFlashLastAddress) {
-    nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+    NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
     spiFlashLastAddress = 0;
   }
   unsigned char buf[1];
@@ -2513,7 +2511,7 @@ void jshFlashRead(void * buf, uint32_t addr, uint32_t len) {
         || spiFlashLastAddress==0
 #endif
        ) {
-      nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
       uint32_t b;
       // Read
 #ifdef SPIFLASH_READ2X
@@ -2522,13 +2520,13 @@ void jshFlashRead(void * buf, uint32_t addr, uint32_t len) {
       b = 0x03000000;
 #endif
       b |= addr;
-      nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_CS].pin);
       spiFlashWrite32(b);
 #ifdef SPIFLASH_READ2X
       // Shift out dummy byte as fast as we can
       for (int bit=0;bit<8;bit++) {
-        nrf_gpio_pin_set((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
-        nrf_gpio_pin_clear((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+        NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+        NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
       }
 #endif
     }
