@@ -24,7 +24,7 @@ info = {
 # 'default_console_rx' : "D8",
 # 'default_console_baudrate' : "9600",
  'variables' : 2500, # How many variables are allocated for Espruino to use. RAM will be overflowed if this number is too high and code won't compile.
- 'bootloader' : 1, # bootloader seems to have issues when flashed via SWD, diabled for dev work
+ 'bootloader' : 1,
  'binary_name' : 'espruino_%v_id205.hex',
  'build' : {
    'optimizeflags' : '-Os',
@@ -32,7 +32,8 @@ info = {
      'BLUETOOTH',
      'TERMINAL',
      'GRAPHICS',
-     'LCD_SPI'
+     'LCD_SPI',
+     'JIT',
    ],
    'makefile' : [
      'DEFINES += -DCONFIG_NFCT_PINS_AS_GPIOS', # Allow the reset pin to work
@@ -59,8 +60,7 @@ info = {
 
      'DEFINES += -DESPR_USE_STORAGE_CACHE=32', # Add a 32 entry cache to speed up finding files
           
-      # used for accelerometer stepcounter and GPS NMEA parsing:
-     'SOURCES += libs/misc/nmea.c',
+      # used for accelerometer stepcounter
      'SOURCES += libs/misc/stepcount.c',
 
      'WRAPPERSOURCES += libs/banglejs/jswrap_bangle.c',

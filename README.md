@@ -11,6 +11,7 @@ What works in firmware:
         * Paletted images: 3 bit / 8 color RGB, 4 bit / 16 color MAC, 8 bit / 256 color Web (use WebIDE upload image to storage function)
 * Power save
 * [Bangle Class](https://www.espruino.com/Reference#Bangle)
+* 8 MB flash with 2x read speed
 
 Espruino JavaScript for Microcontrollers
 ========================================
