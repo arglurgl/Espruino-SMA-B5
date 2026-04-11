@@ -12,6 +12,7 @@ What works in firmware:
 * Power save
 * [Bangle Class](https://www.espruino.com/Reference#Bangle)
 * 8 MB flash with 2x read speed
+* Accelerometer
 
 Espruino JavaScript for Microcontrollers
 ========================================

@@ -135,6 +135,11 @@ devices = {
              'pin_lcd_bl_driver' : 'D3', # power for backlight, controlled by a driver IC, active high
              'pin_lcd_touch_vdd' : 'D46' # power for LCD and touchscreen, controlled by a FET, active high
           },
+  'ACCEL' : {
+          'device' : 'KX023', 'addr' : 0x1f, # this actually is a KX022 but it is close enough to work
+          'pin_sda' : 'D11',
+          'pin_scl' : 'D14'
+          },
 };
 
 # left-right, or top-bottom order

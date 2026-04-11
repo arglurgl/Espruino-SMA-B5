@@ -664,6 +664,8 @@ JshI2CInfo i2cInternal;
 
 #ifdef ID205
 #define HOME_BTN 1
+JshI2CInfo i2cInternal;
+#define ACCEL_I2C &i2cInternal
 #endif
 // =========================================================================
 
@@ -1484,9 +1486,14 @@ void peripheralPollHandler() {
     if ((bangleFlags&JSBF_WAKEON_TOUCH) && (tapInfo&2)/*front*/)
       wakeUpBangle("tap");
 #endif
-    // double tap
+    // double tap  
+#ifdef ID205 //fix double tap direction on id205
+    if ((bangleFlags&JSBF_WAKEON_DBLTAP) && (tapInfo&1)/*front on ID205*/ && (tapInfo&0x80)/*double-tap*/)
+      wakeUpBangle("doubleTap");
+#else //standard direction
     if ((bangleFlags&JSBF_WAKEON_DBLTAP) && (tapInfo&2)/*front*/ && (tapInfo&0x80)/*double-tap*/)
       wakeUpBangle("doubleTap");
+#endif
 
     // tap ignores lock
     bangleTasks |= JSBT_ACCEL_TAPPED;
@@ -1539,6 +1546,12 @@ void peripheralPollHandler() {
 #ifdef BANGLEJS_Q3
     newx = -newx; //consistent directions with Bangle
     newz = -newz;
+#endif
+#ifdef ID205
+    short temp = newx; // fix orientation of accelerometer on ID205
+    newx = newy;
+    newy = -temp;
+    newz = newz;
 #endif
 #ifdef ACCEL_DEVICE_KX126
     newy = -newy;
@@ -4444,12 +4457,21 @@ bool jswrap_banglejs_idle() {
         if (tapInfo&16) string="right";
         if (tapInfo&32) string="left";
 #else
+#ifdef ID205
+        if (tapInfo&1) string="front";
+        if (tapInfo&2) string="back";
+        if (tapInfo&4) string="left";
+        if (tapInfo&8) string="right";
+        if (tapInfo&16) string="bottom";
+        if (tapInfo&32) string="top";
+#else
         if (tapInfo&1) string="front";
         if (tapInfo&2) string="back";
         if (tapInfo&4) string="top";
         if (tapInfo&8) string="bottom";
         if (tapInfo&16) string="left";
         if (tapInfo&32) string="right";
+#endif
 #endif
 #endif
         int n = (tapInfo&0x80)?2:1;
