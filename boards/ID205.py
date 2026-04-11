@@ -73,7 +73,10 @@ info = {
      'NRF_SDK15=1', # activate for SDK15, defaults to SDK12
      'BOOTLOADER_SETTINGS_FAMILY=NRF52840',
 
+     # flash settings
      'DEFINES+=-DSPIFLASH_SLEEP_CMD', # SPI flash needs to be explicitly slept and woken up
+     'DEFINES += -DSPIFLASH_READ2X', # Read SPI flash at 2x speed using MISO and MOSI for IO
+     'DEFINES += -DSPIFLASH_READ2X_DUAL_PORT', # Support mixed P0/P1 pins (ID205 fix)
 
    ]
  }

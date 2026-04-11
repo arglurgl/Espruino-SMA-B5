@@ -487,6 +487,26 @@ static void spiFlashRead(unsigned char *rx, unsigned int len) {
 
 #ifdef SPIFLASH_READ2X
 // Use MISO and MOSI to read data from flash (Dual Output Fast Read 0x3B)
+#ifdef SPIFLASH_READ2X_DUAL_PORT
+// ID205 FIX: Support mixed P0/P1 pins using corrected NRF_GPIO_PIN_READ_FAST macro
+static void spiFlashRead2x(unsigned char *rx, unsigned int len) {
+  NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0); // High-Z input
+  for (unsigned int i=0;i<len;i++) {
+    int result = 0;
+    #pragma GCC unroll 4
+    for (int bit=0;bit<4;bit++) {
+      NRF_GPIO_PIN_SET_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+      int miso_bit = NRF_GPIO_PIN_READ_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin);
+      int mosi_bit = NRF_GPIO_PIN_READ_FAST((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin);
+      result = (result<<2) | (miso_bit<<1) | mosi_bit;
+      NRF_GPIO_PIN_CLEAR_FAST((uint32_t)pinInfo[SPIFLASH_PIN_SCK].pin);
+    }
+    rx[i] = result;
+  }
+  NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0x303); // high drive output
+}
+#else
+// Original implementation - requires MOSI and MISO on port 0
 static void spiFlashRead2x(unsigned char *rx, unsigned int len) {
   assert((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin<32); // port 0
   assert((uint32_t)pinInfo[SPIFLASH_PIN_MISO].pin<32); // port 0
@@ -506,6 +526,8 @@ static void spiFlashRead2x(unsigned char *rx, unsigned int len) {
   }
   NRF_GPIO_PIN_CNF((uint32_t)pinInfo[SPIFLASH_PIN_MOSI].pin, 0x303); // high drive output
 }
+#endif
+
 #endif
 
 static void spiFlashWrite(unsigned char *tx, unsigned int len) {
