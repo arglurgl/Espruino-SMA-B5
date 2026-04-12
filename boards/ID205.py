@@ -66,6 +66,7 @@ info = {
      'WRAPPERSOURCES += libs/banglejs/jswrap_bangle.c',
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
      'DEFINES += -DBANGLEJS',
+     'DEFINES += -DTOUCH_DEVICE_IT7259=1', # Enable IT7259 touchscreen handler
 
      'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
@@ -130,6 +131,13 @@ devices = {
             'pin_miso' : 'D17',
             'size' : 8*1024*1024, # 8MB
             'memmap_base' : 0x60000000 # map into the address space (in software)
+          },
+  'TOUCH' : {
+            'device' : 'IT7259', 'addr' : 0x46,
+            'pin_sda' : 'D21',
+            'pin_scl' : 'D23',
+            'pin_rst' : 'D33',
+            'pin_irq' : 'D32'
           },
   'MISC' : {
              'pin_lcd_bl_driver' : 'D3', # power for backlight, controlled by a driver IC, active high

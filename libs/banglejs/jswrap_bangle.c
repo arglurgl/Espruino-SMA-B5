@@ -666,6 +666,10 @@ JshI2CInfo i2cInternal;
 #define HOME_BTN 1
 JshI2CInfo i2cInternal;
 #define ACCEL_I2C &i2cInternal
+#ifdef TOUCH_PIN_SDA
+JshI2CInfo i2cTouch;
+#define TOUCH_I2C &i2cTouch
+#endif
 #endif
 // =========================================================================
 
@@ -2055,6 +2059,183 @@ void touchHandlerInternal(int tx, int ty, int pts, int gesture) {
 }
 #endif
 #ifdef TOUCH_I2C
+#ifdef TOUCH_DEVICE_IT7259
+//TODO: move defines to a better location
+// partly based on https://github.com/embedded-drivers/it7259/blob/master/src/lib.rs
+#define IT7259_BUFFER_TYPE_COMMAND (0b00100000)
+#define IT7259_BUFFER_TYPE_QUERY (0b10000000)
+#define IT7259_BUFFER_TYPE_RESPONSE (0b10100000)
+#define IT7259_BUFFER_TYPE_POINT_INFO (0b11100000)
+#define IT7259_FORMAT_TAG_POINT_DATA (0b0000)
+#define IT7259_FORMAT_TAG_GESTURE (0b1000)
+#define IT7259_FORMAT_TAG_TOUCH_EVENT (0b0100)
+#define IT7259_FORMAT_TAG_WAKEUP (0b0001)
+// IT7259 touchscreen handler - reads from point buffer and maps to CST816S-compatible format
+void touchHandler(bool state, IOEventFlags flags) {
+  if (state) return; // only interested in when low
+
+  unsigned char touchPts = 0; // Default: no touch, will be set based on received point data
+  unsigned char gesture = 0;  // Default: no gesture, will be set based received gesture data
+  int tx = 0; // will be set based on received point data
+  int ty = 0; // will be set based on received point data
+
+  unsigned char buf[14]; // max size of data report is 14 bytes
+  bool finger;// finger or pen?
+  bool palm; // palm detected?
+
+  uint16_t x0, y0, pressure0 = 0; // point 0 data
+  //uint16_t x1, y1, pressure1; // point 1 data
+  //uint16_t x2, y2, pressure2; // point 2 data
+  uint16_t gesture_id = 0; // gesture id for gesture reports (IT7259 format)
+
+  // check query buffer to see what caused the interrupt
+  jsi2cReadReg(TOUCH_I2C, TOUCH_ADDR, IT7259_BUFFER_TYPE_QUERY, 1, buf);
+  uint8_t command_status = buf[0] & 0b00000011; 
+  bool new_packet = (buf[0] & 0b10000000) != 0;
+  bool currently_touched = (buf[0] & 0b01000000) != 0;
+  //jsiConsolePrintf("\nCommand status: %d, New packet: %d, Currently touched: %d\n", command_status, new_packet, currently_touched);
+  
+  // read 'data report' from point information buffer, can be point data, gesture report, touch event, or wakeup report
+  jsi2cReadReg(TOUCH_I2C, TOUCH_ADDR, IT7259_BUFFER_TYPE_POINT_INFO, 14, buf); 
+  uint8_t format_tag = (buf[0] & 0b11110000) >> 4;
+  switch (format_tag)
+  {
+  case IT7259_FORMAT_TAG_POINT_DATA:
+    //jsiConsolePrintf("Point data report received. Buf[0]=%02x\n", buf[0]);
+    finger = buf[0] & 0b1000 != 0; // finger or pen?
+    palm = buf[1] & 0b1 != 0; // palm detection flag, does not seem to ever trigger
+    
+    // check for point 0
+    if ((buf[0] & 0b001) != 0) {
+            x0 = buf[2] | ((buf[3] & 0b00001111) << 8);
+            y0 = buf[4] | ((buf[3] & 0b11110000) << 4);
+            pressure0 = buf[5] & 0b1111;
+            //jsiConsolePrintf("Point0 data: finger=%d palm=%d x0=%d y0=%d pressure0=%d\n", finger, palm, x0, y0, pressure0);
+            // set output variables for compatibility with CST816S handler
+            touchPts = 1;
+            tx = x0;
+            ty = y0;
+    }
+    
+    /* controller actually never reports more than one point on this display
+    // check for point 1
+    if ((buf[0] & 0b010) != 0) {
+            x1 = buf[6] | ((buf[7] & 0b00001111) << 8);
+            y1 = buf[8] | ((buf[7] & 0b11110000) << 4);
+            pressure1 = buf[9] & 0b1111;
+            jsiConsolePrintf("Point1 data: finger=%d palm=%d x1=%d y1=%d pressure1=%d\n", finger, palm, x1, y1, pressure1);
+    }
+    // check for point 2
+    if ((buf[0] & 0b100) != 0) {
+            x2 = buf[10] | ((buf[11] & 0b00001111) << 8);
+            y2 = buf[12] | ((buf[11] & 0b11110000) << 4);
+            pressure2 = buf[13] & 0b1111;
+            jsiConsolePrintf("Point2 data: finger=%d palm=%d x2=%d y2=%d pressure2=%d\n", finger, palm, x2, y2, pressure2);
+    }*/
+    break;
+  case IT7259_FORMAT_TAG_GESTURE: 
+  //TODO: check if the current approach for gestures disrupts continous drags on the screen
+  // we might need to cache x/y depending on what the setting of JSBT_DRAG in internalTouchHandler tries to accomplish
+    //jsiConsolePrintf("Gesture report received\n");
+    gesture_id = buf[1];
+    //jsiConsolePrintf("Gesture ID: 0x%02x\n", gesture_id);
+    // handle gestures we care for
+    switch (gesture_id){
+      case 0x20: // tap
+        //jsiConsolePrintf("Gesture: Tap\n");
+        //set x0 and y0 to the tap coordinates
+        x0 = buf[3] << 8 | buf[2];
+        y0 = buf[5] << 8 | buf[4];
+        //jsiConsolePrintf("Tap coordinates: x=%d y=%d\n", x0, y0);
+        // we can treat tap as a click for compatibility with CST816S handler
+        touchPts = 1;
+        tx = x0;
+        ty = y0;
+        gesture = 5; // single click
+        break;
+      case 0x21: // press
+        //jsiConsolePrintf("Gesture: Press\n");
+        //set x0 and y0 to the press coordinates
+        x0 = buf[3] << 8 | buf[2];
+        y0 = buf[5] << 8 | buf[4];
+        //jsiConsolePrintf("Press coordinates: x=%d y=%d\n", x0, y0);
+        // we can treat press as a long press for compatibility with CST816S handler
+        touchPts = 1;
+        tx = x0;
+        ty = y0;
+        gesture = 0x0C; // long touch
+        break;
+      case 0x22: // flick
+        //jsiConsolePrintf("Gesture: Flick\n");
+        // check direction of flick
+        switch (buf[10] & 0b1111){
+          case 0b1000: 
+            //jsiConsolePrintf("Flick direction: Up\n");
+            // we can treat flick up as a swipe up for compatibility with CST816S handler
+            gesture = 2; // slide up
+            break;
+          case 0b1100: 
+            //jsiConsolePrintf("Flick direction: Down\n");
+            // we can treat flick down as a swipe down for compatibility with CST816S handler
+            gesture = 1; // slide down
+            break;
+          case 0b1110: 
+            //jsiConsolePrintf("Flick direction: Left\n");
+            // we can treat flick left as a swipe left for compatibility with CST816S handler
+            gesture = 3; // slide left
+            break;
+          case 0b1010: 
+            //jsiConsolePrintf("Flick direction: Right\n");
+            // we can treat flick right as a swipe right for compatibility with CST816S handler
+            gesture = 4; // slide right
+            break;
+        }
+        break;
+      case 0x23: // double tap
+        //jsiConsolePrintf("Gesture: Double Tap\n");
+        //set x0 and y0 to the double tap coordinates
+        x0 = buf[3] << 8 | buf[2];
+        y0 = buf[5] << 8 | buf[4];
+        //jsiConsolePrintf("Double tap coordinates: x=%d y=%d\n", x0, y0);
+        touchPts = 1;
+        tx = x0;
+        ty = y0;
+        gesture = 0x0b; // double touch
+        break;      
+    }
+    break;
+  case IT7259_FORMAT_TAG_TOUCH_EVENT:
+    //jsiConsolePrintf("Touch event report received\n");
+    return; // ignore
+  case IT7259_FORMAT_TAG_WAKEUP:
+    //jsiConsolePrintf("Wakeup report received\n");
+    return; // ignore 
+
+  default:
+    jsiConsolePrintf("Unknown touchscreen format tag\n");
+    break;
+  }
+    
+  // all variables should be set properly based on received data, now call the common handler with mapped values
+  
+  touchHandlerInternal(
+    (tx-touchMinX) * LCD_WIDTH / (touchMaxX-touchMinX),   // touchX
+    (ty-touchMinY) * LCD_HEIGHT / (touchMaxY-touchMinY),  // touchY
+    touchPts,   // touch points
+    gesture);   // gesture
+  
+  // // Debug: show what we're sending
+  // static int lastDebugX = -1, lastDebugY = -1;
+  // int scaledX = (tx-touchMinX) * LCD_WIDTH / (touchMaxX-touchMinX);
+  // int scaledY = (ty-touchMinY) * LCD_HEIGHT / (touchMaxY-touchMinY);
+  // if (touchPts && (scaledX != lastDebugX || scaledY != lastDebugY)) {
+  //   jsiConsolePrintf("Scaled: X=%d Y=%d gesture=%d (raw X=%d Y=%d)\n", scaledX, scaledY, gesture, tx, ty);
+  //   lastDebugX = scaledX;
+  //   lastDebugY = scaledY;
+  // }
+}
+#else
+// CST816S touchscreen handler (default/original)
 void touchHandler(bool state, IOEventFlags flags) {
   if (state) return; // only interested in when low
   // Ok, now get touch info
@@ -2078,6 +2259,7 @@ void touchHandler(bool state, IOEventFlags flags) {
     buf[1], // touchPts
     buf[0]); // gesture
 }
+#endif
 #endif
 
 
@@ -3767,6 +3949,21 @@ NO_INLINE void jswrap_banglejs_hwinit() {
   i2cInternal.pinSCL = ACCEL_PIN_SCL;
   i2cInternal.clockStretch = false;
   jsi2cSetup(&i2cInternal);
+#ifdef ID205
+#ifdef TOUCH_PIN_SDA
+  // ID205 has separate I2C buses for ACCEL (D11/D14) and TOUCH (D21/D23)
+  jshI2CInitInfo(&i2cTouch);
+  i2cTouch.bitrate = 0x7FFFFFFF; // make it as fast as we can go
+  i2cTouch.pinSDA = TOUCH_PIN_SDA;
+  i2cTouch.pinSCL = TOUCH_PIN_SCL;
+  i2cTouch.clockStretch = false;
+  jsi2cSetup(&i2cTouch);
+  // reset touch controller
+  jshPinOutput(TOUCH_PIN_RST, 0);
+  jshDelayMicroseconds(2); // make sure we reset and not enter sleep mode
+  jshPinOutput(TOUCH_PIN_RST, 1);
+#endif
+#endif
 #endif // BANGLEJS_Q3/ACCEL_PIN_SDA
 #ifdef BANGLEJS_Q3
   // Touch init
@@ -3863,11 +4060,21 @@ NO_INLINE void jswrap_banglejs_init() {
   jshPinOutput(VIBRATE_PIN,0);
 #endif
 
-#ifdef BANGLEJS_Q3
+#if defined(BANGLEJS_Q3) || defined(ID205)
 #ifndef EMULATED
   jshSetPinShouldStayWatched(TOUCH_PIN_IRQ,true);
   channel = jshPinWatch(TOUCH_PIN_IRQ, true, JSPW_NONE);
   if (channel!=EV_NONE) jshSetEventCallback(channel, touchHandler);
+#endif
+#endif
+
+  // Set up touch calibration for ID205 (IT7259 touchscreen on 240x240 display)
+#ifdef ID205
+#ifdef TOUCH_DEVICE_IT7259
+  touchMinX = 0;
+  touchMaxX = 240;
+  touchMinY = 0;
+  touchMaxY = 240;
 #endif
 #endif
 
