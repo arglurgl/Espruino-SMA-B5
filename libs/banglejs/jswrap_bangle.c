@@ -664,8 +664,10 @@ JshI2CInfo i2cInternal;
 
 #ifdef ID205
 #define HOME_BTN 1
+#ifdef ACCEL_PIN_SDA
 JshI2CInfo i2cInternal;
 #define ACCEL_I2C &i2cInternal
+#endif
 #ifdef TOUCH_PIN_SDA
 JshI2CInfo i2cTouch;
 #define TOUCH_I2C &i2cTouch
@@ -2201,7 +2203,8 @@ void touchHandler(bool state, IOEventFlags flags) {
         tx = x0;
         ty = y0;
         gesture = 0x0b; // double touch
-        break;      
+        break;
+      //TODO: we need to add a default case so unhandled gestures dont return 0 pts at 0,0 to internalTouchHandler
     }
     break;
   case IT7259_FORMAT_TAG_TOUCH_EVENT:
@@ -3136,12 +3139,28 @@ touchscreen work or not)
 void _jswrap_banglejs_setLocked(bool isLocked, const char *reason) {
 #if defined(TOUCH_I2C)
   if (isLocked) {
+    // power down touchscreen
+#ifdef TOUCH_DEVICE_IT7259
+    // IT7259 can simply be powered down by setting the reset pin low
+    jshPinOutput(TOUCH_PIN_RST, 0);
+#else
+    // standard CST816S touchscreen - put into deep sleep mode
     jsi2cWriteReg(TOUCH_I2C, TOUCH_ADDR, 0xE5, 0x03);
-  } else { // best way to wake up is to reset
+#endif
+  } else {
+    // power up touchscreen
+#ifdef TOUCH_DEVICE_IT7259
+    // IT7259: wake from reset power-down
+    jshPinOutput(TOUCH_PIN_RST, 1);
+    jshDelayMicroseconds(1000);
+#else
+    // standard CST816S touchscreen 
+    // best way to wake up is to reset
     jshPinOutput(TOUCH_PIN_RST, 0);
     jshDelayMicroseconds(1000);
     jshPinOutput(TOUCH_PIN_RST, 1);
     jshDelayMicroseconds(1000);
+#endif    
   }
 #endif
   if ((bangleFlags&JSBF_LOCKED) != isLocked) {
@@ -6107,7 +6126,7 @@ call drawWidgets if you decide to clear the entire screen with `g.clear()`.
 /*JSON{
     "type" : "staticmethod", "class" : "Bangle", "name" : "drawWidgets", "patch":true,
     "generate_js" : "libs/js/banglejs/Bangle_drawWidgets_Q3.min.js",
-    "#if" : "defined(BANGLEJS) && defined(BANGLEJS_Q3)"
+    "#if" : "(defined(BANGLEJS) && defined(BANGLEJS_Q3)) || (defined(BANGLEJS) && defined(ID205))"
 }
 */
 
@@ -6438,7 +6457,7 @@ To remove the scroller, just call `E.showScroller()`
 /*JSON{
     "type" : "staticmethod", "class" : "E", "name" : "showMenu", "patch":true,
     "generate_js" : "libs/js/banglejs/E_showMenu_Q3.min.js",
-    "#if" : "defined(BANGLEJS) && defined(BANGLEJS_Q3)"
+    "#if" : "(defined(BANGLEJS) && defined(BANGLEJS_Q3)) || (defined(BANGLEJS) && defined(ID205))"
 }
 */
 /*JSON{
@@ -6450,13 +6469,13 @@ To remove the scroller, just call `E.showScroller()`
 /*JSON{
     "type" : "staticmethod", "class" : "E", "name" : "showPrompt", "patch":true,
     "generate_js" : "libs/js/banglejs/E_showPrompt_Q3.min.js",
-    "#if" : "defined(BANGLEJS) && defined(BANGLEJS_Q3)"
+    "#if" : "(defined(BANGLEJS) && defined(BANGLEJS_Q3)) || (defined(BANGLEJS) && defined(ID205))"
 }
 */
 /*JSON{
     "type" : "staticmethod", "class" : "E", "name" : "showScroller", "patch":true,
     "generate_js" : "libs/js/banglejs/E_showScroller_Q3.min.js",
-    "#if" : "defined(BANGLEJS) && defined(BANGLEJS_Q3)"
+    "#if" : "(defined(BANGLEJS) && defined(BANGLEJS_Q3)) || (defined(BANGLEJS) && defined(ID205))"
 }
 */
 
@@ -6648,7 +6667,7 @@ with a swipe by using:
 /*JSON{
     "type" : "staticmethod", "class" : "Bangle", "name" : "setUI", "patch":true,
     "generate_js" : "libs/js/banglejs/Bangle_setUI_Q3.min.js",
-    "#if" : "defined(BANGLEJS) && defined(BANGLEJS_Q3)"
+    "#if" : "(defined(BANGLEJS) && defined(BANGLEJS_Q3)) || (defined(BANGLEJS) && defined(ID205))"
 }
 */
 
