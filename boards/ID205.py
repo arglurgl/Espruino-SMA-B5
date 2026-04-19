@@ -46,7 +46,7 @@ info = {
      'DEFINES+=-DESPR_GRAPHICS_INTERNAL=1',
      'DEFINES+=-DUSE_FONT_6X8 -DGRAPHICS_PALETTED_IMAGES -DESPR_GRAPHICS_12BIT -DGRAPHICS_ANTIALIAS -DESPR_PBF_FONTS',
      'DEFINES+=-DNO_DUMP_HARDWARE_INITIALISATION', # don't dump hardware init - not used and saves 1k of flash
-     'INCLUDE += -I$(ROOT)/libs/banglejs -I$(ROOT)/libs/misc',
+     'INCLUDE += -I$(ROOT)/libs/banglejs -I$(ROOT)/libs/misc -I$(ROOT)/libs/touch',
      
      # enable bangle storage factory reset and needed fonts
      'SOURCES += libs/banglejs/banglejs2_storage_default.c',
@@ -69,6 +69,7 @@ info = {
 
      # Touchscreen settings
      'DEFINES += -DTOUCH_DEVICE_IT7259=1', # Enable IT7259 touchscreen handler
+     'SOURCES += libs/touch/it7259.c', # IT7259 hardware driver
      'SOURCES += libs/misc/unistroke.c',
      'WRAPPERSOURCES += libs/misc/jswrap_unistroke.c',
      'DEFINES += -DESPR_BANGLE_UNISTROKE=1', # Enable unistroke gesture recognition
