@@ -74,7 +74,7 @@ Bangle.setUI({
     let yAbs = (e.y + rScroll - R.y);
     let yInElement = yAbs - i*options.h;
     //print("     ",idxToY(i));
-    if (e.y>163 && idxToY(i)>163) { // 12px from bottom
+    if (e.y>227 && idxToY(i)>227) { // 12px from bottom, changed from 163 to 227 for ID205. TODO: find a better way to do this that works across devices
       /* If the bottom-most item is only just showing and we
       tap on it, choose the one above instead */
       i--;
