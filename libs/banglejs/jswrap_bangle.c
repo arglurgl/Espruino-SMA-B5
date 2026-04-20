@@ -3761,7 +3761,7 @@ NO_INLINE void jswrap_banglejs_hwinit() {
 #endif
 #ifdef ID205
   jshPinOutput(MISC_PIN_LCD_BL_DRIVER,1); // enable backlight power supply
-  jshPinOutput(MISC_PIN_LCD_TOUCH_VDD,1); // enable LCD and touch power supply
+  jshPinOutput(MISC_PIN_LCD_TOUCH_VDD,0); // enable LCD and touch power supply (active low)
   jshPinOutput(LCD_BL,1); // enable backlight switch transistor
 #endif
 #ifndef EMULATED
@@ -3814,6 +3814,7 @@ NO_INLINE void jswrap_banglejs_hwinit() {
 #ifdef TOUCH_DEVICE_IT7259
   // IT7259 driver handles its own I2C initialization and device reset
   it7259_power_up();
+  it7259_power_down();//immediately power down to save power, will be repowered on display unlock
 
 #endif
 #ifdef BANGLEJS_Q3

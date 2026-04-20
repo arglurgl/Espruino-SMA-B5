@@ -11,24 +11,24 @@
 
 
 ## Screen Connector (Touch/Display)
-| Pin | Display Side      | Main PCB Side         | NRF52    |
-| --- | ----------------- | --------------------- | -------- |
-| 1   | Display SCK       | TP1                   | D30      |
-| 2   | Display DC        | TP2                   | D28      |
-| 3   | Display MOSI      | TP3                   | D18      |
-| 4   | Display CS        | TP4                   | D19      |
-| 5   | GND               | GND                   |          |
-| 6   | Touch SDA         | TP6                   | D21      |
-| 7   | Touch SCL         | TP7                   | D23      |
-| 8   | Touch RDY (Int?)  | TP8                   | D32      |
-| 9   | Touch Reset       | TP9                   | D33      |
-| 10  | 3.3V Touch, Disp. | TP10, Transistor VDD  | D46      |
-| 11  | GND               | GND                   |          |
-| 12  | Display RST       | TP12                  | D2       |
-| 13  | Backlight K       | TP13, Transitor GND   | D35 = on |
-| 14  | Backlight K       | TP13, Transitor GND   | D35 = on |
-| 15  | Backlight A       | TP15, LED Driver?     | D3  = on |
-| 16  | Backlight A       | NC? (Empty Footprint) |          |
+| Pin | Display Side      | Main PCB Side         | NRF52         |
+| --- | ----------------- | --------------------- | ------------- |
+| 1   | Display SCK       | TP1                   | D30           |
+| 2   | Display DC        | TP2                   | D28           |
+| 3   | Display MOSI      | TP3                   | D18           |
+| 4   | Display CS        | TP4                   | D19           |
+| 5   | GND               | GND                   |               |
+| 6   | Touch SDA         | TP6                   | D21           |
+| 7   | Touch SCL         | TP7                   | D23           |
+| 8   | Touch RDY (Int?)  | TP8                   | D32           |
+| 9   | Touch Reset       | TP9                   | D33           |
+| 10  | 3.3V Touch, Disp. | TP10, Transistor VDD  | D46 low = on  |
+| 11  | GND               | GND                   |               |
+| 12  | Display RST       | TP12                  | D2            |
+| 13  | Backlight K       | TP13, Transitor GND   | D35 high = on |
+| 14  | Backlight K       | TP13, Transitor GND   | D35 high = on  |
+| 15  | Backlight A       | TP15, LED Driver?     | D3  high = on  |
+| 16  | Backlight A       | NC? (Empty Footprint) |               |
 
 ## Heartrate / Buttons Connector
 
