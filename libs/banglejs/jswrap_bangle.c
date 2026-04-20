@@ -2088,8 +2088,8 @@ void touchHandler(bool state, IOEventFlags flags) {
   int ty = 0; // will be set based on received point data
 
   unsigned char buf[14]; // max size of data report is 14 bytes
-  bool finger;// finger or pen?
-  bool palm; // palm detected?
+  //bool finger;// finger or pen?
+  //bool palm; // palm detected?
 
   uint16_t x0, y0, pressure0 = 0; // point 0 data
   //uint16_t x1, y1, pressure1; // point 1 data
@@ -2100,8 +2100,13 @@ void touchHandler(bool state, IOEventFlags flags) {
   jsi2cReadReg(TOUCH_I2C, TOUCH_ADDR, IT7259_BUFFER_TYPE_QUERY, 1, buf);
   uint8_t command_status = buf[0] & 0b00000011; 
   bool new_packet = (buf[0] & 0b10000000) != 0;
-  bool currently_touched = (buf[0] & 0b01000000) != 0;
+  //bool currently_touched = (buf[0] & 0b01000000) != 0;
   //jsiConsolePrintf("\nCommand status: %d, New packet: %d, Currently touched: %d\n", command_status, new_packet, currently_touched);
+
+  if (!new_packet) {
+    // no new data, this shouldn't really happen as we got here via an interrupt, but just in case, ignore it
+    return;
+  }
   
   // read 'data report' from point information buffer, can be point data, gesture report, touch event, or wakeup report
   jsi2cReadReg(TOUCH_I2C, TOUCH_ADDR, IT7259_BUFFER_TYPE_POINT_INFO, 14, buf); 
@@ -2110,8 +2115,8 @@ void touchHandler(bool state, IOEventFlags flags) {
   {
   case IT7259_FORMAT_TAG_POINT_DATA:
     //jsiConsolePrintf("Point data report received. Buf[0]=%02x\n", buf[0]);
-    finger = buf[0] & 0b1000 != 0; // finger or pen?
-    palm = buf[1] & 0b1 != 0; // palm detection flag, does not seem to ever trigger
+    //finger = buf[0] & 0b1000 != 0; // finger or pen?
+    //palm = buf[1] & 0b1 != 0; // palm detection flag, does not seem to ever trigger
     
     // check for point 0
     if ((buf[0] & 0b001) != 0) {
@@ -2125,25 +2130,9 @@ void touchHandler(bool state, IOEventFlags flags) {
             ty = y0;
     }
     
-    /* controller actually never reports more than one point on this display
-    // check for point 1
-    if ((buf[0] & 0b010) != 0) {
-            x1 = buf[6] | ((buf[7] & 0b00001111) << 8);
-            y1 = buf[8] | ((buf[7] & 0b11110000) << 4);
-            pressure1 = buf[9] & 0b1111;
-            jsiConsolePrintf("Point1 data: finger=%d palm=%d x1=%d y1=%d pressure1=%d\n", finger, palm, x1, y1, pressure1);
-    }
-    // check for point 2
-    if ((buf[0] & 0b100) != 0) {
-            x2 = buf[10] | ((buf[11] & 0b00001111) << 8);
-            y2 = buf[12] | ((buf[11] & 0b11110000) << 4);
-            pressure2 = buf[13] & 0b1111;
-            jsiConsolePrintf("Point2 data: finger=%d palm=%d x2=%d y2=%d pressure2=%d\n", finger, palm, x2, y2, pressure2);
-    }*/
+    // controller actually never reports more than one point on this display, in theory there could be point 1,2 also
     break;
   case IT7259_FORMAT_TAG_GESTURE: 
-  //TODO: check if the current approach for gestures disrupts continous drags on the screen
-  // we might need to cache x/y depending on what the setting of JSBT_DRAG in internalTouchHandler tries to accomplish
     //jsiConsolePrintf("Gesture report received\n");
     gesture_id = buf[1];
     //jsiConsolePrintf("Gesture ID: 0x%02x\n", gesture_id);
@@ -2210,38 +2199,36 @@ void touchHandler(bool state, IOEventFlags flags) {
         ty = y0;
         gesture = 0x0b; // double touch
         break;
-      //TODO: we need to add a default case so unhandled gestures dont return 0 pts at 0,0 to internalTouchHandler
+      
+      default:
+        // we ignore all other gestures
+        return;
     }
-    break;
+    break; // break for IT7259_FORMAT_TAG_GESTURE
   case IT7259_FORMAT_TAG_TOUCH_EVENT:
     //jsiConsolePrintf("Touch event report received\n");
-    return; // ignore
+    return; // ignore, this event never seems to fire
   case IT7259_FORMAT_TAG_WAKEUP:
     //jsiConsolePrintf("Wakeup report received\n");
     return; // ignore 
 
   default:
-    jsiConsolePrintf("Unknown touchscreen format tag\n");
+    jsiConsolePrintf("Unknown IT7259 format tag\n");
     break;
   }
+
+  // if this is a release event, we seem to need to set the x/y to the last known values to emulate the CST816S behaviour
+  if (tPts == 0) {
+    tx = touchX;
+    ty = touchY;
+  }
     
-  // all variables should be set properly based on received data, now call the common handler with mapped values
-  
+  // all variables should be set properly based on received data, now call the common handler with mapped values  
   touchHandlerInternal(
     (tx-touchMinX) * LCD_WIDTH / (touchMaxX-touchMinX),   // touchX
     (ty-touchMinY) * LCD_HEIGHT / (touchMaxY-touchMinY),  // touchY
     tPts,   // touch points
     gesture);   // gesture
-  
-  // // Debug: show what we're sending
-  // static int lastDebugX = -1, lastDebugY = -1;
-  // int scaledX = (tx-touchMinX) * LCD_WIDTH / (touchMaxX-touchMinX);
-  // int scaledY = (ty-touchMinY) * LCD_HEIGHT / (touchMaxY-touchMinY);
-  // if (tPts && (scaledX != lastDebugX || scaledY != lastDebugY)) {
-  //   jsiConsolePrintf("Scaled: X=%d Y=%d gesture=%d (raw X=%d Y=%d)\n", scaledX, scaledY, gesture, tx, ty);
-  //   lastDebugX = scaledX;
-  //   lastDebugY = scaledY;
-  // }
 }
 #else
 // CST816S touchscreen handler (default/original)
