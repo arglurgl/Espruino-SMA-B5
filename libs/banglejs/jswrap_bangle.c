@@ -2011,9 +2011,6 @@ void touchHandlerInternal(int tx, int ty, int pts, int gesture) {
   // deal with the case where we rotated the Bangle.js screen
   deviceToGraphicsCoordinates(&graphicsInternal, &tx, &ty);
 
-  //TODO: remove this debug print
-  jsiConsolePrintf("Touch: %d,%d pts:%d gesture:%d\n", tx, ty, pts, gesture);
-
   int dx = tx-touchX;
   int dy = ty-touchY;
 
@@ -2222,7 +2219,7 @@ void touchHandler(bool state, IOEventFlags flags) {
     tx = touchX;
     ty = touchY;
   }
-    
+
   // all variables should be set properly based on received data, now call the common handler with mapped values  
   touchHandlerInternal(
     (tx-touchMinX) * LCD_WIDTH / (touchMaxX-touchMinX),   // touchX
