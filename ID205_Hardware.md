@@ -86,10 +86,11 @@
 | DIO  | no GPIO |
 
 ## Charging
-| Name             | NRF52                       |
-| ---------------- | --------------------------- |
-| Charge Indicator | D45, charge = low           |
-| Battery Voltage  | D4, full is approx. 0.202 V |
+| Name             | NRF52                              |
+| ---------------- | ---------------------------------- |
+| Charge Indicator | D45, charge = low                  |
+| Battery Voltage  | D4, voltage = analogRead(D4)*20.28 |
+|                  |                                    |
 
 ## Other
 Vibrate = D8
