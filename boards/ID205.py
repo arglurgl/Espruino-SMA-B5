@@ -85,6 +85,8 @@ info = {
      'DEFINES += -DSPIFLASH_READ2X', # Read SPI flash at 2x speed using MISO and MOSI for IO
      'DEFINES += -DSPIFLASH_READ2X_DUAL_PORT', # Support mixed P0/P1 pins (ID205 fix)
 
+     'DEFINES += -DESPR_USE_SPI3=1', # Use SPIM3 (even though it has errata 195) as it's much faster, bitrate is set in lcd config below
+
    ]
  }
 };
@@ -123,6 +125,7 @@ devices = {
             'pin_sck' : 'D30',
             'pin_mosi' : 'D18',
             'pin_bl' : 'D35', # backlight pwm, active high
+            'bitrate' : 32000000 , # this bitrate only works on SPIM3, see makefile flag above
           },
   'BAT' : {
             'pin_charging' : 'D45', # active low
