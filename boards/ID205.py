@@ -67,11 +67,12 @@ info = {
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
      'DEFINES += -DBANGLEJS',
 
-     # Touchscreen settings
+     # touchscreen settings
      'DEFINES += -DTOUCH_DEVICE_IT7259=1', # Enable IT7259 touchscreen handler
-     'SOURCES += libs/misc/unistroke.c',
-     'WRAPPERSOURCES += libs/misc/jswrap_unistroke.c',
-     'DEFINES += -DESPR_BANGLE_UNISTROKE=1', # Enable unistroke gesture recognition
+     # unistroke gesture recognition:
+     #'SOURCES += libs/misc/unistroke.c',
+     #'WRAPPERSOURCES += libs/misc/jswrap_unistroke.c',
+     #'DEFINES += -DESPR_BANGLE_UNISTROKE=1', 
 
      'DFU_PRIVATE_KEY=targets/nrf5x_dfu/dfu_private_key.pem',
      'DFU_SETTINGS=--application-version 0xff --hw-version 52 --sd-req 0xa9,0xae,0xb6',
