@@ -113,8 +113,6 @@ chip = {
 devices = {
   'BTN1' : { 'pin' : 'D5', 'pinstate' : 'IN_PULLDOWN' }, # Pin negated in software
   'BTN2' : { 'pin' : 'D7', 'pinstate' : 'IN_PULLDOWN' }, # Pin negated in software
-  'BTN3' : { 'pin' : 'D45', 'pinstate' : 'IN_PULLDOWN' }, # fake button to make bangle code work, D45 is actually the charge indicator
-#  'LED1' : { 'pin' : 'D13' }, # Pin negated in software
   'VIBRATE' : { 'pin' : 'D8' }, # Pin negated in software
   'LCD' : {
             'width' : 240, 'height' : 240, 'bpp' : 12, # 16 normal, 12 bit is possible
