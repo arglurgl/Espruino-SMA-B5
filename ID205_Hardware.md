@@ -90,7 +90,7 @@
 | ---------------- | ---------------------------------- |
 | Charge Indicator | D45, charge = low                  |
 | Battery Voltage  | D4, voltage = analogRead(D4)*20.28 |
-|                  |                                    |
+|                  | Note: battery is HV LiPo and when full = 4.35V   |
 
 ## Other
 Vibrate = D8
