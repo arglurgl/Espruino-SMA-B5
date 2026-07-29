@@ -65,7 +65,7 @@ info = {
 
      'WRAPPERSOURCES += libs/banglejs/jswrap_bangle.c',
      'JSMODULESOURCES += libs/js/banglejs/locale.min.js',
-     'DEFINES += -DBANGLEJS',
+     'DEFINES += -DBANGLEJS -DESPR_HWVERSION=2',
 
      # touchscreen settings
      'DEFINES += -DTOUCH_DEVICE_IT7259=1', # Enable IT7259 touchscreen handler
