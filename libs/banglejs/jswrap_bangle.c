@@ -3228,6 +3228,9 @@ JsVarInt jswrap_banglejs_getBattery() {
 #elif defined(BANGLEJS_F18)
   const JsVarFloat vlo = 0.51;
   const JsVarFloat vhi = 0.62;
+#elif defined(ID205)
+  const JsVarFloat vlo = 0.148;
+  const JsVarFloat vhi = 0.2145;
 #elif defined(DICKENS)
 #ifdef LCD_TEARING  // DICKENS2 hardware (with LCD tearing signal) has VDD=3.3V
   const JsVarFloat vlo = 3.55 / (3.3*2);  // Operates down to 3.05V, but battery starts dropping very rapidly from 3.55V, so treat this as the end-point.
